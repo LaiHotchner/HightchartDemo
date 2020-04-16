@@ -9,13 +9,12 @@ import { SeriesOptionsType, Options } from 'highcharts';
 })
 export class AccumulationCheckinComponent implements OnInit {
 
-  index = 1;              // Mock数据索引
+  index = 0;              // Mock数据索引
   currentTime: Date;      // 页面显示用
   accumulativeCheckin = 0; // 当前累计checkin人数
 
 
   timer: any;             // 数据刷新计时器，因为需要动态修改计时器间隔时间
-  timerInterval = 1000;   // 数据刷新计时器的间隔时间，开始时为1000毫秒
   pointInterval = 1000;   // 数据点的初始时间间隔，1000毫秒
   pointIntervalDict = [
     {
@@ -123,14 +122,17 @@ export class AccumulationCheckinComponent implements OnInit {
     this.refreshPointInterval();
     this.initChart();
 
-    this.timer = setInterval(this.updateData.bind(this), this.timerInterval);
+    this.timer = setInterval(this.updateData.bind(this), 1000);
   }
 
   private initChart() {
     var seriesCheckin = [];
     var seriesStay = [];
 
-    var pointCount = Math.random() * (40 - 20 + 1) + 20;
+    var current = this.getCurrentTime();
+    var startTime = this.getStartTime();
+
+    var pointCount = Math.floor((current - startTime) / this.pointInterval);
 
     this.accumulativeCheckin = 0;
     for (var i = 0; i < pointCount; i++) {
@@ -201,7 +203,7 @@ export class AccumulationCheckinComponent implements OnInit {
     this.index++;
     this.recheckIndex();
 
-    this.timer = setInterval(this.updateData.bind(this), this.timerInterval);
+    this.timer = setInterval(this.updateData.bind(this), this.pointInterval);
   }
 
   private recheckIndex() {
