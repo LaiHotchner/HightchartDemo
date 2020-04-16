@@ -23,7 +23,7 @@ export class RealtimeCheckinComponent implements OnInit {
     },
     xAxis: {
       type: 'datetime',
-      tickInterval: 1000,
+      tickPixelInterval: 200,
       dateTimeLabelFormats: {
         second: '%H:%M:%S',
         minute: '%H:%M',
