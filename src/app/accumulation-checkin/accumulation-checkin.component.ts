@@ -17,7 +17,55 @@ export class AccumulationCheckinComponent implements OnInit {
   timer: any;             // 数据刷新计时器，因为需要动态修改计时器间隔时间
   timerInterval = 1000;   // 数据刷新计时器的间隔时间，开始时为1000毫秒
   pointInterval = 1000;   // 数据点的初始时间间隔，1000毫秒
-
+  pointIntervalDict = [
+    {
+      // 0~60秒：每秒更新一次
+      min: 0,
+      max: 60,
+      value: 1000
+    },
+    {
+      // 1min~5min：每3秒更新一次
+      min: 60,
+      max: 300,
+      value: 3000
+    },
+    {
+      // 5min~30min：每10秒更新一次
+      min: 300,
+      max: 1800,
+      value: 10000
+    },
+    {
+      // 30min~1hour：每30秒更新一次
+      min: 1800,
+      max: 3600,
+      value: 30000
+    },
+    {
+      // 1hour~2hour：每1分钟更新一次
+      min: 3600,
+      max: 7200,
+      value: 60000
+    },
+    {
+      // 2hour~6hour：每3分钟更新一次
+      min: 7200,
+      max: 21600,
+      value: 180000
+    },
+    {
+      // 6hour~12hour：每5分钟更新一次
+      min: 21600,
+      max: 43200,
+      value: 300000
+    },
+    {
+      // 12hour以上：每10分钟更新一次
+      min: 43200,
+      max: 86400,
+      value: 600000
+    }];
 
   chart: Highcharts.Chart;
   Highcharts = Highcharts;
@@ -84,6 +132,7 @@ export class AccumulationCheckinComponent implements OnInit {
 
     var pointCount = Math.random() * (40 - 20 + 1) + 20;
 
+    this.accumulativeCheckin = 0;
     for (var i = 0; i < pointCount; i++) {
       var checkin = Math.random() * 10 + 5;
       this.accumulativeCheckin += checkin;
@@ -103,37 +152,14 @@ export class AccumulationCheckinComponent implements OnInit {
     var startTime = this.getStartTime();
 
     var interval = (current - startTime) / 1000;
-    if (interval >= 0 && interval < 60) {
-      // 0~60秒：每秒更新一次
-      this.pointInterval = 1000;
-    }
-    else if (interval >= 60 && interval < 5 * 60) {
-      // 1min~5min：每3秒更新一次
-      this.pointInterval = 3000;
-    }
-    else if (interval >= 5 * 60 && interval < 30 * 60) {
-      // 5min~30min：每10秒更新一次
-      this.pointInterval = 10 * 1000;
-    }
-    else if (interval >= 30 * 60 && interval < 60 * 60) {
-      // 30min~1hour：每30秒更新一次
-      this.pointInterval = 30 * 1000;
-    }
-    else if (interval >= 60 * 60 && interval < 2 * 60 * 60) {
-      // 1hour~5hour：每1分钟更新一次
-      this.pointInterval = 60 * 1000;
-    }
-    else if (interval >= 2 * 60 * 60 && interval < 6 * 60 * 60) {
-      // 2hour~6hour：每3分钟更新一次
-      this.pointInterval = 3 * 60 * 1000;
-    }
-    else if (interval >= 6 * 60 * 60 && interval < 12 * 60 * 60) {
-      // 6hour~12hour：每5分钟更新一次
-      this.pointInterval = 5 * 60 * 1000;
-    }
-    else if (interval >= 12 * 60 * 60) {
-      // 12hour以上：每10分钟更新一次
-      this.pointInterval = 10 * 60 * 1000;
+
+    for (var val of this.pointIntervalDict) {
+      if (interval >= val.min && interval < val.max) {
+        this.pointInterval = val.value;
+        console.log("interval:" + interval);
+        console.log(this.pointInterval);
+        break;
+      }
     }
 
     var newChartOption = {
@@ -152,17 +178,9 @@ export class AccumulationCheckinComponent implements OnInit {
   private getCurrentTime() {
     var startTime = this.getStartTime();
     var resultTime = new Date();
-    if (this.index < 10) {
-      resultTime.setTime(startTime + 60 * 1000);
-    }
-    else if (this.index < 20) {
-      resultTime.setTime(startTime + 10 * 60 * 1000);
-    }
-    else if (this.index < 30) {
-      resultTime.setTime(startTime + 60 * 60 * 1000);
-    }
-    else if (this.index < 40) {
-      resultTime.setTime(startTime + 6 * 60 * 60 * 1000);
+    if (this.index % 5 == 0) {
+      var multiple = Math.pow(2, Math.floor(this.index / 5));
+      resultTime.setTime(startTime + multiple * 60 * 1000);
     }
     this.currentTime = resultTime;
     return resultTime.getTime();
@@ -187,19 +205,6 @@ export class AccumulationCheckinComponent implements OnInit {
   }
 
   private recheckIndex() {
-    // if (this.index < 10) {
-    //   this.timerInterval = 1000;
-    // }
-    // else if (this.index < 20) {
-    //   this.timerInterval = 2000;
-    // }
-    // else if (this.index < 30) {
-    //   this.timerInterval = 3000;
-    // }
-    // else if (this.index < 40) {
-    //   this.timerInterval = 4000;
-    // }
-
     if (this.index % 5 == 0) {
       this.refreshPointInterval();
       this.initChart();
