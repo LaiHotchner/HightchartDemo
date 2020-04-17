@@ -10,7 +10,7 @@ import { QueryService } from '../services/query.service';
 })
 export class AccumulationCheckinComponent implements OnInit {
 
-  currentTime = new Date();   // 当前时间,页面显示用
+  currentTime = new Date();
   mockStartTime = [
     new Date(2020, 3, 17, 0, 0, 30),
     new Date(2020, 3, 17, 0, 3, 0),
@@ -22,7 +22,7 @@ export class AccumulationCheckinComponent implements OnInit {
     new Date(2020, 3, 17, 16, 45, 0)
   ];
 
-  pointInterval = 1000;       // 数据点的初始时间间隔，1000毫秒
+  pointInterval = 0;
   pointIntervalDict = [
     {
       // 0~60秒：每秒更新一次
@@ -118,14 +118,12 @@ export class AccumulationCheckinComponent implements OnInit {
     series:
       [{
         name: '当日累计进站人数',
-        data: [],
-        pointInterval: 1000
+        data: []
       },
       {
         name: '当前候车室人数',
         yAxis: 1,
-        data: [],
-        pointInterval: 1000
+        data: []
       }]
   };
 
@@ -208,7 +206,5 @@ export class AccumulationCheckinComponent implements OnInit {
 
   updateStartTime(e) {
     this.currentTime = new Date(e.target.value);
-    this.refreshInterval();
-    this.initData();
   }
 }
