@@ -10,8 +10,17 @@ import { QueryService } from '../services/query.service';
 })
 export class AccumulationCheckinComponent implements OnInit {
 
-  index = 0;                  // Mock数据索引
   currentTime = new Date();   // 当前时间,页面显示用
+  mockStartTime = [
+    new Date(2020, 3, 17, 0, 0, 30),
+    new Date(2020, 3, 17, 0, 3, 0),
+    new Date(2020, 3, 17, 0, 15, 0),
+    new Date(2020, 3, 17, 0, 45, 0),
+    new Date(2020, 3, 17, 1, 15, 0),
+    new Date(2020, 3, 17, 3, 30, 0),
+    new Date(2020, 3, 17, 12, 15, 0),
+    new Date(2020, 3, 17, 16, 45, 0)
+  ];
 
   pointInterval = 1000;       // 数据点的初始时间间隔，1000毫秒
   pointIntervalDict = [
@@ -19,57 +28,49 @@ export class AccumulationCheckinComponent implements OnInit {
       // 0~60秒：每秒更新一次
       min: 0,
       max: 60,
-      value: 1000,
-      mockDate: new Date(2020, 3, 17, 0, 0, 30)
+      value: 1000
     },
     {
       // 1min~5min：每3秒更新一次
       min: 60,
       max: 300,
-      value: 3000,
-      mockDate: new Date(2020, 3, 17, 0, 3, 0)
+      value: 3000
     },
     {
       // 5min~30min：每10秒更新一次
       min: 300,
       max: 1800,
-      value: 10000,
-      mockDate: new Date(2020, 3, 17, 0, 15, 0)
+      value: 10000
     },
     {
       // 30min~1hour：每30秒更新一次
       min: 1800,
       max: 3600,
-      value: 30000,
-      mockDate: new Date(2020, 3, 17, 0, 45, 0)
+      value: 30000
     },
     {
       // 1hour~2hour：每1分钟更新一次
       min: 3600,
       max: 7200,
-      value: 60000,
-      mockDate: new Date(2020, 3, 17, 1, 15, 0)
+      value: 60000
     },
     {
       // 2hour~6hour：每3分钟更新一次
       min: 7200,
       max: 21600,
-      value: 180000,
-      mockDate: new Date(2020, 3, 17, 3, 30, 0)
+      value: 180000
     },
     {
       // 6hour~12hour：每5分钟更新一次
       min: 21600,
       max: 43200,
-      value: 300000,
-      mockDate: new Date(2020, 3, 17, 12, 15, 0)
+      value: 300000
     },
     {
       // 12hour以上：每10分钟更新一次
       min: 43200,
       max: 86400,
-      value: 600000,
-      mockDate: new Date(2020, 3, 17, 16, 45, 0)
+      value: 600000
     }];
 
   chart: Highcharts.Chart;
@@ -132,7 +133,8 @@ export class AccumulationCheckinComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.currentTime = this.pointIntervalDict[0].mockDate;
+    // mock 使用，正式代码应该移除
+    this.currentTime = this.mockStartTime[0];
   }
 
   private load(e: Event) {
@@ -171,9 +173,6 @@ export class AccumulationCheckinComponent implements OnInit {
     var seriesCheckin = this.queryService.getCheckinStatisticInfo(this.pointInterval, current);
     var seriesStay = this.queryService.getStayStatisticInfo(this.pointInterval, current);
 
-    var strDate = new Date(current).toLocaleTimeString();
-    console.log(strDate + ": 累计进站数据量：" + seriesCheckin.length);
-
     this.chart.series[0].setData(seriesCheckin, false, false);
     this.chart.series[1].setData(seriesStay, false, false);
     this.chart.redraw();
@@ -205,28 +204,11 @@ export class AccumulationCheckinComponent implements OnInit {
   }
   private getCurrentTime() {
     return this.currentTime.getTime();
-    // return new Date().getTime();
   }
 
-
-
-  // private recheckIndex() {
-  //   this.index++;
-  //   var resultTime = new Date();
-  //   if (this.index % 5 == 0) {
-  //     var mockDataIndex = Math.floor(this.index / 5);
-  //     if (mockDataIndex >= this.pointIntervalDict.length) {
-  //       resultTime = new Date();
-  //     }
-  //     else {
-  //       var mockStartTime = this.pointIntervalDict[mockDataIndex].mockDate;
-  //       resultTime = new Date(mockStartTime.getTime() + this.index * 1000);
-  //     }
-  //   }
-  //   this.currentTime = resultTime;
-
-  //   if (this.index % 5 == 0) {
-  //     this.refreshChartInfo();
-  //   }
-  // }
+  updateStartTime(e) {
+    this.currentTime = new Date(e.target.value);
+    this.refreshInterval();
+    this.initData();
+  }
 }
