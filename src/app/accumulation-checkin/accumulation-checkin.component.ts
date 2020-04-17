@@ -9,7 +9,6 @@ import { QueryService } from '../services/query.service';
   styleUrls: ['./accumulation-checkin.component.css']
 })
 export class AccumulationCheckinComponent implements OnInit {
-
   currentTime = new Date();
   mockStartTime = [
     new Date(2020, 3, 17, 0, 0, 30),
@@ -82,7 +81,7 @@ export class AccumulationCheckinComponent implements OnInit {
       }
     },
     title: {
-      text: '杭州东站进站总人数/当前候车室人数'
+      text: ''
     },
     xAxis: {
       type: 'datetime',
@@ -141,23 +140,24 @@ export class AccumulationCheckinComponent implements OnInit {
     this.refreshInterval();
     this.initData();
   }
-  private refreshInterval() {
-    var lastInterval = this.pointInterval;
-    var current = this.getCurrentTime();
-    var startTime = this.getStartTime();
 
-    var interval = (current - startTime) / 1000;
-    for (var val of this.pointIntervalDict) {
+  private refreshInterval() {
+    const lastInterval = this.pointInterval;
+    const current = this.getCurrentTime();
+    const startTime = this.getStartTime();
+
+    const interval = (current - startTime) / 1000;
+    for (const val of this.pointIntervalDict) {
       if (interval >= val.min && interval < val.max) {
         this.pointInterval = val.value;
         break;
       }
     }
     // 间隔无变化则不刷新
-    if (lastInterval == this.pointInterval) {
+    if (lastInterval === this.pointInterval) {
       return false;
     }
-    var newChartOption = {
+    const newChartOption = {
       pointStart: startTime,
       pointInterval: this.pointInterval
     } as SeriesOptionsType;
@@ -166,17 +166,21 @@ export class AccumulationCheckinComponent implements OnInit {
     this.chart.series[1].update(newChartOption);
     return true;
   }
+
   private initData() {
-    var current = this.getCurrentTime();
-    var seriesCheckin = this.queryService.getCheckinStatisticInfo(this.pointInterval, current);
-    var seriesStay = this.queryService.getStayStatisticInfo(this.pointInterval, current);
+    const current = this.getCurrentTime();
+    const seriesCheckin = this.queryService.getCheckinStatisticInfo(this.pointInterval, current);
+    const seriesStay = this.queryService.getStayStatisticInfo(this.pointInterval, current);
 
     this.chart.series[0].setData(seriesCheckin, false, false);
     this.chart.series[1].setData(seriesStay, false, false);
     this.chart.redraw();
 
-    setTimeout(() => { this.updateData(); }, this.pointInterval);
+    setTimeout(() => {
+      this.updateData();
+    }, this.pointInterval);
   }
+
   private updateData() {
     this.currentTime = new Date((this.currentTime.getTime() + this.pointInterval));
     // 如果时间间隔发生变化，则需要重新加载所有数据
@@ -185,9 +189,9 @@ export class AccumulationCheckinComponent implements OnInit {
       return;
     }
 
-    var current = this.getCurrentTime();
-    var seriesCheckin = this.queryService.getCheckinStatisticInfo(this.pointInterval, current);
-    var seriesStay = this.queryService.getStayStatisticInfo(this.pointInterval, current);
+    const current = this.getCurrentTime();
+    const seriesCheckin = this.queryService.getCheckinStatisticInfo(this.pointInterval, current);
+    const seriesStay = this.queryService.getStayStatisticInfo(this.pointInterval, current);
 
     // 初始化时已经添加了之前的数据，因此此时只要添加最后一个数据即可
     this.chart.series[0].addPoint(seriesCheckin[seriesCheckin.length - 1], false, false);
@@ -195,11 +199,15 @@ export class AccumulationCheckinComponent implements OnInit {
 
     this.chart.redraw();
 
-    setTimeout(() => { this.updateData(); }, this.pointInterval);
+    setTimeout(() => {
+      this.updateData();
+    }, this.pointInterval);
   }
+
   private getStartTime() {
     return new Date(new Date().toLocaleDateString()).getTime();
   }
+
   private getCurrentTime() {
     return this.currentTime.getTime();
   }
