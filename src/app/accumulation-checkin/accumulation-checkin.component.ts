@@ -11,15 +11,18 @@ import { QueryService } from '../services/query.service';
 export class AccumulationCheckinComponent implements OnInit {
   currentTime = new Date();
   mockStartTime = [
-    new Date(2020, 3, 17, 0, 0, 30),
-    new Date(2020, 3, 17, 0, 3, 0),
-    new Date(2020, 3, 17, 0, 15, 0),
-    new Date(2020, 3, 17, 0, 45, 0),
-    new Date(2020, 3, 17, 1, 15, 0),
-    new Date(2020, 3, 17, 3, 30, 0),
-    new Date(2020, 3, 17, 12, 15, 0),
-    new Date(2020, 3, 17, 16, 45, 0)
+    new Date(2020, 3, 18, 0, 0, 30),
+    new Date(2020, 3, 18, 0, 3, 0),
+    new Date(2020, 3, 18, 0, 15, 0),
+    new Date(2020, 3, 18, 0, 45, 0),
+    new Date(2020, 3, 18, 1, 15, 0),
+    new Date(2020, 3, 18, 3, 30, 0),
+    new Date(2020, 3, 18, 12, 15, 0),
+    new Date(2020, 3, 18, 16, 45, 0)
   ];
+
+  addPointTimer: any;
+  checkIntervalMs = 1000;
 
   pointInterval = 0;
   pointIntervalDict = [
@@ -137,11 +140,13 @@ export class AccumulationCheckinComponent implements OnInit {
   private load(e: Event) {
     this.chart = e.target as unknown as Highcharts.Chart;
 
-    this.refreshInterval();
-    this.initData();
+    setInterval(this.checkInterval.bind(this), this.checkIntervalMs);
   }
 
-  private refreshInterval() {
+  private checkInterval() {
+    // mock 使用，正式代码应该移除这一句
+    this.currentTime = new Date((this.getCurrentTime() + this.checkIntervalMs));
+
     const lastInterval = this.pointInterval;
     const current = this.getCurrentTime();
     const startTime = this.getStartTime();
@@ -153,43 +158,43 @@ export class AccumulationCheckinComponent implements OnInit {
         break;
       }
     }
+
+    console.log("check interval at" + this.currentTime.toLocaleTimeString());
+
     // 间隔无变化则不刷新
     if (lastInterval === this.pointInterval) {
-      return false;
+      return;
     }
+    this.initChart(startTime, current);
+  }
+
+  private initChart(startTime, current) {
+    clearTimeout(this.addPointTimer);
+    this.refreshOption(startTime);
+    this.redrawSeries(current);
+    this.addPointTimer = setInterval(this.addPoint.bind(this), this.pointInterval);
+  }
+
+  private refreshOption(startTime) {
     const newChartOption = {
       pointStart: startTime,
       pointInterval: this.pointInterval
     } as SeriesOptionsType;
-
     this.chart.series[0].update(newChartOption);
     this.chart.series[1].update(newChartOption);
-    return true;
   }
 
-  private initData() {
-    const current = this.getCurrentTime();
+  private redrawSeries(current) {
     const seriesCheckin = this.queryService.getCheckinStatisticInfo(this.pointInterval, current);
     const seriesStay = this.queryService.getStayStatisticInfo(this.pointInterval, current);
-
     this.chart.series[0].setData(seriesCheckin, false, false);
     this.chart.series[1].setData(seriesStay, false, false);
     this.chart.redraw();
-
-    setTimeout(() => {
-      this.updateData();
-    }, this.pointInterval);
   }
 
-  private updateData() {
-    this.currentTime = new Date((this.currentTime.getTime() + this.pointInterval));
-    // 如果时间间隔发生变化，则需要重新加载所有数据
-    if (this.refreshInterval()) {
-      this.initData();
-      return;
-    }
-
+  private addPoint() {
     const current = this.getCurrentTime();
+    // 根据新的当前时间获取最新数据
     const seriesCheckin = this.queryService.getCheckinStatisticInfo(this.pointInterval, current);
     const seriesStay = this.queryService.getStayStatisticInfo(this.pointInterval, current);
 
@@ -197,11 +202,11 @@ export class AccumulationCheckinComponent implements OnInit {
     this.chart.series[0].addPoint(seriesCheckin[seriesCheckin.length - 1], false, false);
     this.chart.series[1].addPoint(seriesStay[seriesStay.length - 1], false, false);
 
-    this.chart.redraw();
+    // 整个图标更新效果不好
+    // this.chart.series[0].setData(seriesCheckin, false, false);
+    // this.chart.series[1].setData(seriesStay, false, false);
 
-    setTimeout(() => {
-      this.updateData();
-    }, this.pointInterval);
+    this.chart.redraw();
   }
 
   private getStartTime() {
@@ -209,6 +214,8 @@ export class AccumulationCheckinComponent implements OnInit {
   }
 
   private getCurrentTime() {
+    // 正式代码
+    // return new Date().getTime();
     return this.currentTime.getTime();
   }
 
