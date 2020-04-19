@@ -11,14 +11,14 @@ import { QueryService } from '../services/query.service';
 export class AccumulationCheckinComponent implements OnInit {
   currentTime = new Date();
   mockStartTime = [
-    new Date(2020, 3, 18, 0, 0, 30),
-    new Date(2020, 3, 18, 0, 3, 0),
-    new Date(2020, 3, 18, 0, 15, 0),
-    new Date(2020, 3, 18, 0, 45, 0),
-    new Date(2020, 3, 18, 1, 15, 0),
-    new Date(2020, 3, 18, 3, 30, 0),
-    new Date(2020, 3, 18, 12, 15, 0),
-    new Date(2020, 3, 18, 16, 45, 0)
+    new Date(2020, 3, 19, 0, 0, 30),
+    new Date(2020, 3, 19, 0, 3, 0),
+    new Date(2020, 3, 19, 0, 15, 0),
+    new Date(2020, 3, 19, 0, 45, 0),
+    new Date(2020, 3, 19, 1, 15, 0),
+    new Date(2020, 3, 19, 3, 30, 0),
+    new Date(2020, 3, 19, 12, 15, 0),
+    new Date(2020, 3, 19, 16, 45, 0)
   ];
 
   addPointTimer: any;
