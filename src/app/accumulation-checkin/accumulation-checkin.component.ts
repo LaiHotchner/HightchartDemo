@@ -202,10 +202,6 @@ export class AccumulationCheckinComponent implements OnInit {
     this.chart.series[0].addPoint(seriesCheckin[seriesCheckin.length - 1], false, false);
     this.chart.series[1].addPoint(seriesStay[seriesStay.length - 1], false, false);
 
-    // 整个图标更新效果不好
-    // this.chart.series[0].setData(seriesCheckin, false, false);
-    // this.chart.series[1].setData(seriesStay, false, false);
-
     this.chart.redraw();
   }
 

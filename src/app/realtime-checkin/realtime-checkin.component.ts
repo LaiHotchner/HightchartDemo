@@ -18,6 +18,9 @@ export class RealtimeCheckinComponent implements OnInit {
         load: this.load.bind(this)
       }
     },
+    legend: {
+      enabled: false
+    },
     title: {
       text: '杭州东站实时进站人数'
     },
@@ -38,7 +41,7 @@ export class RealtimeCheckinComponent implements OnInit {
     },
     tooltip: {
       dateTimeLabelFormats: {
-        millisecond:"%A, %b %e, %H:%M:%S",
+        millisecond: "%A, %b %e, %H:%M:%S",
         second: '%H:%M:%S',
         minute: '%H:%M',
         hour: '%H:%M',
